@@ -69,7 +69,7 @@ double Generator::calculateSegLength(int node, Spline spline) {
     newPoint = getSplinePoint((double)node + t, spline);
     double xrt = (newPoint.x - oldPoint.x)*(newPoint.x - oldPoint.x);
     double yrt = (newPoint.y - oldPoint.y)*(newPoint.y - oldPoint.y);
-    totalSegLength += squareRoot((xrt+yrt));
+    totalSegLength += sqrt((xrt+yrt));
 
     // std::cout << "Seg length: " << totalSegLength << std::endl;
     oldPoint = newPoint;
@@ -86,7 +86,7 @@ Spline Generator::buildPath(Spline spline) {
   internalSpline.waypoints.insert(internalSpline.waypoints.begin(), spline.entryCtrl); // add ctrlpnt to beginning
   internalSpline.waypoints.push_back(spline.exitCtrl); // add to the back of array
 
-  for (int i = 0; i < internalSpline.waypoints.size(); i++) {
+  for (int i = 1; i < internalSpline.waypoints.size()-1; i++) {
     totalLength += calculateSegLength(i, internalSpline);
     // std::cout << "Length... " << totalLength << std::endl;
   }
