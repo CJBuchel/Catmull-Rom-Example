@@ -1,6 +1,38 @@
-#include <math.h>
-#include <iostream>
 #include "Generator.h"
+
+static double square(double x, double i, double j) {
+  double mid = (i + j) / 2;
+  double mul = mid * mid;
+
+  if ((mul == x) || (abs(mul - x) < 0.00001)) {
+    return mid;
+  } else if (mul < x) {
+    return square(x, mid, j);
+  } else {
+    return square(x, i, mid);
+  }
+}
+
+static double squareRoot(double x) {
+  double i = 1;
+  bool found = false;
+  double res = 0;
+
+  while (!found) {
+    if (i * i == x) {
+      // std::cout << std::fixed << std::setprecision(0) << x << std::endl;
+      found = true;
+    } else if (i * i > x) {
+      res = square(x, i - 1, i);
+      // std::cout << std::fixed << std::setprecision(5) << res << std::endl;
+      found = true;
+    }
+
+    i++;
+  }
+
+  return res;
+}
 
 
 Waypoint getSplinePoint(double t, Spline spline) {
@@ -28,15 +60,16 @@ Waypoint getSplinePoint(double t, Spline spline) {
 }
 
 double Generator::calculateSegLength(int node, Spline spline) {
-  double totalSegLength = 0;
+  double totalSegLength = 0.0f;
 
   Waypoint oldPoint, newPoint;
   oldPoint = getSplinePoint((double)node, spline);
 
-  for (double t = 0; t < 1; t += 0.001) {
+  for (double t = 0.0f; t < 1.0f; t += 0.05f) {
     newPoint = getSplinePoint((double)node + t, spline);
-    double bufferLength = (newPoint.x - oldPoint.x)*(newPoint.x - oldPoint.x) + (newPoint.y - oldPoint.y)*(newPoint.y - oldPoint.y);
-    totalSegLength += sqrt(bufferLength);
+    double xrt = (newPoint.x - oldPoint.x)*(newPoint.x - oldPoint.x);
+    double yrt = (newPoint.y - oldPoint.y)*(newPoint.y - oldPoint.y);
+    totalSegLength += squareRoot((xrt+yrt));
 
     // std::cout << "Seg length: " << totalSegLength << std::endl;
     oldPoint = newPoint;
@@ -55,7 +88,7 @@ Spline Generator::buildPath(Spline spline) {
 
   for (int i = 0; i < internalSpline.waypoints.size(); i++) {
     totalLength += calculateSegLength(i, internalSpline);
-    std::cout << "Length... " << totalLength << std::endl;
+    // std::cout << "Length... " << totalLength << std::endl;
   }
 
   std::cout << "Final Length: " << totalLength << std::endl;
