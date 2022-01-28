@@ -88,7 +88,7 @@ Spline Generator::buildPath(Spline spline) {
 
   for (int i = 1; i < internalSpline.waypoints.size()-1; i++) {
     totalLength += calculateSegLength(i, internalSpline);
-    // std::cout << "Length... " << totalLength << std::endl;
+    std::cout << "Length... " << totalLength << std::endl;
   }
 
   std::cout << "Final Length: " << totalLength << std::endl;
