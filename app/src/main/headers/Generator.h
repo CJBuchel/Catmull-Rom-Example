@@ -1,6 +1,10 @@
 #include <math.h>
 #include <iostream>
-#include <bits/stdc++.h>
+#ifdef __linux__ 
+  #include <bits/stdc++.h>
+#elif _WIN32
+  #include <iomanip>
+#endif
 
 #include "Splines.h"
 
