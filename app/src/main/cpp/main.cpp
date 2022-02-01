@@ -6,10 +6,10 @@
 #include "Generator.h"
 
 Spline spline {{
+  {0,0},
   {2,0},
-  {3,0}},
-
-  {1,0}, {4,0}
+  {3,0},
+  {4,0}}
 };
 
 Spline outputSpline;
@@ -17,16 +17,11 @@ Spline outputSpline;
 
 
 int main() {
-  outputSpline = Generator::buildPath(spline);
-  std::cout << outputSpline.waypoints.size() << std::endl;
-  std::cout << "Actual Length: " << outputSpline.actualLength << std::endl;
-  // std::cout << "Length: " << outputSpline.totalLength << std::endl;
-  // for (double i = 0; i < outputSpline.totalLength; i+=0.01) {
-  //   double distance = i;
-  //   double angle = CatmullRom::getAngleDeg(distance, outputSpline);
-  //   Waypoint point = CatmullRom::getSplinePoint(distance, outputSpline);
 
-  //   std::cout << std::fixed << std::setprecision(5) << "Distance: " << distance << ", Angle: " << angle << ", x,y: (" << point.x << "," << point.y << ")" << std::endl;
-  // }
+  // Set the step size super low (absolutely useless, 0.05 works for us. But just there to give an idea of how accurate it can be)
+  Generator::setStepSize(0.00001);
+  if (Generator::buildPath(spline) == -1) {
+    std::cout << "Spline Build failed" << std::endl;
+  }
   return 0;
 }

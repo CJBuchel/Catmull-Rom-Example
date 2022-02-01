@@ -10,8 +10,11 @@
 
 class Generator {
  public:
-  static Spline buildPath(Spline spline);
+  static int buildPath(Spline &spline, int removeNodes = 0);
   static double calculateSegLength(int node, Spline spline);
+  static void setStepSize(double step) {
+    _stepSize = step;
+  }
  private:
-  static constexpr double _stepSize = 0.001;
+  inline static double _stepSize = 0.001;
 };
