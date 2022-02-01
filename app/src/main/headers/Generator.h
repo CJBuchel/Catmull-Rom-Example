@@ -16,5 +16,5 @@ class Generator {
     _stepSize = step;
   }
  private:
-  inline static double _stepSize = 0.001;
+  static double _stepSize;
 };

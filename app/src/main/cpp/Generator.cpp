@@ -1,6 +1,8 @@
 #include "Generator.h"
 #include "Splines.h"
 
+double Generator::_stepSize = 0.001;
+
 // Calculate segmentation length (returns -1 if there was an issue)
 double Generator::calculateSegLength(int node, Spline spline) {
   Waypoint oldPoint, newPoint;
