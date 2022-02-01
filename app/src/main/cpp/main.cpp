@@ -12,10 +12,6 @@ Spline spline {{
   {4,0}}
 };
 
-Spline outputSpline;
-
-
-
 int main() {
 
   // Set the step size super low (absolutely useless, 0.05 works for us. But just there to give an idea of how accurate it can be)
