@@ -19,5 +19,7 @@ int main() {
   if (Generator::buildPath(spline) == -1) {
     std::cout << "Spline Build failed" << std::endl;
   }
+
+  std::cout << "Total Length: " << spline.totalLength << std::endl;
   return 0;
 }

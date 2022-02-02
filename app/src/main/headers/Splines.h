@@ -21,7 +21,7 @@ static void printProgress(double percentage) {
 }
 
 struct Waypoint {
-  long double x, y;
+  double x, y;
   double segLength = 0; // length of segment to next waypoint
   double totalLength = 0; // length of all segments up to and including this segment
 };
