@@ -3,52 +3,48 @@
 
 // Calculate segmentation length (returns -1 if there was an issue)
 double Generator::calculateSegLength(int node, Spline spline) {
-  Waypoint oldPoint, newPoint;
+  double segLength = 0;
+  SplinePoint oldPoint, newPoint;
   oldPoint = CatmullRom::getSplinePoint((float)node, spline);
 
   std::cout << "[Node " << node << "-" << node+1 << "]" << std::endl;
-  std::vector<double> lengthBuffer;
   for (double t = 0.0; t < 1.0; t += _stepSize) {
     newPoint = CatmullRom::getSplinePoint((float)node + t, spline);
-    double xrt = (newPoint.x - oldPoint.x)*(newPoint.x - oldPoint.x);
-    double yrt = (newPoint.y - oldPoint.y)*(newPoint.y - oldPoint.y);
+
+    // 1 means end of spline so return
+    if (newPoint.flag != 0 || oldPoint.flag != 0) {
+      printProgress(1);
+      std::cout << " Complete" << std::endl;
+      return segLength;
+    }
+
+    double xrt = (newPoint.waypoint.x - oldPoint.waypoint.x)*(newPoint.waypoint.x - oldPoint.waypoint.x);
+    double yrt = (newPoint.waypoint.y - oldPoint.waypoint.y)*(newPoint.waypoint.y - oldPoint.waypoint.y);
     double xyrt = (xrt+yrt);
     
-    double bufferValue = 0;
+    double bufferLength = 0;
 
     if (xyrt > 0) {
-      bufferValue = sqrt(xyrt);
-
-      // This is just an error check to see if the value returned is infinite or nan
-      // If it's either it will just output some basic debug values from the previous calculation
-      if (isinf(bufferValue) || isnan(bufferValue)) {
-        bufferValue = 0;
+      bufferLength = sqrt(xyrt);
+      if (isinf(bufferLength) || isnan(bufferLength)) {
+        bufferLength = 0;
         std::cout << " -- Overflow detected, Debug Below -- " << std::endl;
-        std::cout << "| New waypoints x,y: (" << newPoint.x << "," << newPoint.y << ")" << std::endl;
-        std::cout << "| Old waypoints x,y: (" << oldPoint.x << "," << oldPoint.y << ")" << std::endl;
+        std::cout << "| New points x,y: (" << (double)newPoint.waypoint.x << "," << (double)newPoint.waypoint.y << ")" << std::endl;
+        std::cout << "| Old points x,y: (" << oldPoint.waypoint.x << "," << oldPoint.waypoint.y << ")" << std::endl;
         std::cout << "| t value: " << t << std::endl;
         std::cout << "| XY rt was xrt: (" << xrt << ") & yrt: (" << yrt << ")" << std::endl;
         return -1;
       }
     } else {
-      bufferValue = 0;
+      bufferLength = 0;
     }
 
-    lengthBuffer.push_back(bufferValue);
+    segLength += bufferLength;
     oldPoint = newPoint;
-    printProgress(t); // display progress on calculating (because t is 0-1 value this works in our favour for being 0-100 percent complete :) )
+    printProgress(t);
   }
 
-  printProgress(1); // just displays 100% at the end of the segment
-  std::cout << " Complete" << std::endl;
-
-  // Add the values up
-  double totalLength = 0;
-  for (size_t i = 0; i < lengthBuffer.size(); i++) {
-    totalLength += lengthBuffer[i];
-  }
-
-  return totalLength; // return the final length of segment
+  return segLength;
 }
 
 /**
@@ -64,24 +60,20 @@ int Generator::buildPath(Spline &spline, int removeNodes) {
   int nodeNum = spline.waypoints.size();
   std::cout << "-- Calculating Length of spline --" << std::endl;
   std::cout << "-- Total Nodes: " << nodeNum << std::endl;
-  std::vector<double> bufferLength;
   for (size_t node = removeNodes; node < nodeNum - removeNodes; node++) {
     double segLength = calculateSegLength(node, spline);
     if (segLength == -1) {
       std::cout << "Segment Length Error" << std::endl;
       return -1;
     } else {
-      bufferLength.push_back(segLength);
-    }
-  }
 
-  for (size_t i = 0; i < bufferLength.size(); i++) {
-    spline.waypoints[i].segLength = bufferLength[i];
-    spline.totalLength += bufferLength[i];
-    spline.waypoints[i].totalLength = spline.totalLength;
-    if (spline.waypoints[i].segLength > 0) {
-      spline.segmentNum++;
-      std::cout << "Segment " << i << "-" << i+1 << ", Length: " << spline.waypoints[i].segLength << ", Length up to and including: " << spline.waypoints[i].totalLength << std::endl; 
+      spline.waypoints[node].segLength = segLength;
+      spline.totalLength += segLength;
+      spline.waypoints[node].totalLength = spline.totalLength;
+      if (spline.waypoints[node].segLength > 0) {
+        spline.segmentNum++;
+        std::cout << "Segment " << node << "-" << node+1 << ", Length: " << spline.waypoints[node].segLength << ", Length up to and including: " << spline.waypoints[node].totalLength << std::endl; 
+      }
     }
   }
 
